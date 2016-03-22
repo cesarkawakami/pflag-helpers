@@ -39,6 +39,14 @@ func EnsureRequired(cmd *cobra.Command, args []string) error {
 
 // A series of MustGet* functions, which now make some sense.
 
+func MustGetString(fs *pflag.FlagSet, name string) string {
+	if rv, err := fs.GetString(name); err != nil {
+		panic(err)
+	} else {
+		return rv
+	}
+}
+
 func MustGetBool(fs *pflag.FlagSet, name string) bool {
 	if rv, err := fs.GetBool(name); err != nil {
 		panic(err)
