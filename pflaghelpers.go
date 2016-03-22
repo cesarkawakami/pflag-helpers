@@ -3,6 +3,7 @@ package pflaghelpers
 import (
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -10,13 +11,11 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// This should be called by the root command PersistentPreRunE and also
-// by every command that overrides PreRun.
-func EnsureRequired(cmd *cobra.Command, args []string) error {
+func EnsureRequired(cmd *cobra.Command) {
 	problematicFlags := []string{}
 
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if strings.HasSuffix(flag.Usage, "(required)") && !flag.Changed {
+		if IsFlagRequired(flag) && !flag.Changed {
 			problematicFlags = append(problematicFlags, flag.Name)
 		}
 	})
@@ -26,15 +25,41 @@ func EnsureRequired(cmd *cobra.Command, args []string) error {
 			problematicFlags[i] = fmt.Sprintf("`%s`", flagName)
 		}
 
+		var err error
 		if len(problematicFlags) == 1 {
-			return fmt.Errorf("Usage error: flag %s is required", problematicFlags[0])
+			_, err = fmt.Fprintf(cmd.Out(), "Usage error: flag %s is required", problematicFlags[0])
 		} else {
-			return fmt.Errorf(
+			_, err = fmt.Fprintf(cmd.Out(),
 				"Usage error: flags %s are required", strings.Join(problematicFlags, ", "))
 		}
-	}
+		if err != nil {
+			panic(err)
+		}
 
-	return nil
+		os.Exit(1)
+	}
+}
+
+func Bind(cmd *cobra.Command) {
+	cobra.OnInitialize(func() {
+		EnsureRequired(cmd)
+	})
+
+	cmd.SetGlobalNormalizationFunc(func(fs *pflag.FlagSet, name string) pflag.NormalizedName {
+		flag := fs.Lookup(name)
+		if flag == nil {
+			panic("`flag` should never be nil here")
+		}
+		prefix := "1"
+		if IsFlagRequired(flag) {
+			prefix = "0"
+		}
+		return pflag.NormalizedName(prefix + name)
+	})
+}
+
+func IsFlagRequired(flag *pflag.Flag) bool {
+	return strings.HasSuffix(flag.Usage, "(required)")
 }
 
 // A series of MustGet* functions, which now make some sense.
