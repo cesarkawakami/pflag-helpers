@@ -11,7 +11,12 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func EnsureRequired(cmd *cobra.Command) {
+func EnsureRequired(rootCmd *cobra.Command) {
+	cmd, _, err := rootCmd.Find(os.Args[1:])
+	if err != nil {
+		panic(err)
+	}
+
 	problematicFlags := []string{}
 
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
@@ -27,10 +32,11 @@ func EnsureRequired(cmd *cobra.Command) {
 
 		var err error
 		if len(problematicFlags) == 1 {
-			_, err = fmt.Fprintf(cmd.Out(), "Usage error: flag %s is required", problematicFlags[0])
+			_, err = fmt.Fprintf(cmd.Out(),
+				"Usage error: flag %s is required\n", problematicFlags[0])
 		} else {
 			_, err = fmt.Fprintf(cmd.Out(),
-				"Usage error: flags %s are required", strings.Join(problematicFlags, ", "))
+				"Usage error: flags %s are required\n", strings.Join(problematicFlags, ", "))
 		}
 		if err != nil {
 			panic(err)
