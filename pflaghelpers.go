@@ -44,18 +44,6 @@ func Bind(cmd *cobra.Command) {
 	cobra.OnInitialize(func() {
 		EnsureRequired(cmd)
 	})
-
-	cmd.SetGlobalNormalizationFunc(func(fs *pflag.FlagSet, name string) pflag.NormalizedName {
-		flag := fs.Lookup(name)
-		if flag == nil {
-			panic("`flag` should never be nil here")
-		}
-		prefix := "1"
-		if IsFlagRequired(flag) {
-			prefix = "0"
-		}
-		return pflag.NormalizedName(prefix + name)
-	})
 }
 
 func IsFlagRequired(flag *pflag.Flag) bool {
