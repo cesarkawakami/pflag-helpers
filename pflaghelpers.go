@@ -26,6 +26,8 @@ func EnsureRequired(rootCmd *cobra.Command) {
 	})
 
 	if len(problematicFlags) > 0 {
+		cmd.Usage()
+
 		for i, flagName := range problematicFlags {
 			problematicFlags[i] = fmt.Sprintf("`%s`", flagName)
 		}
@@ -33,10 +35,10 @@ func EnsureRequired(rootCmd *cobra.Command) {
 		var err error
 		if len(problematicFlags) == 1 {
 			_, err = fmt.Fprintf(cmd.Out(),
-				"Usage error: flag %s is required\n", problematicFlags[0])
+				"\nUsage error: flag %s is required\n", problematicFlags[0])
 		} else {
 			_, err = fmt.Fprintf(cmd.Out(),
-				"Usage error: flags %s are required\n", strings.Join(problematicFlags, ", "))
+				"\nUsage error: flags %s are required\n", strings.Join(problematicFlags, ", "))
 		}
 		if err != nil {
 			panic(err)
