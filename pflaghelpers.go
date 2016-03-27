@@ -60,10 +60,13 @@ func IsFlagRequired(flag *pflag.Flag) bool {
 
 // A series of MustGet* functions, which now make some sense.
 
-func MustGetString(fs *pflag.FlagSet, name string) string {
+func MustGetString(fs *pflag.FlagSet, name string, allowEmpty bool) string {
 	if rv, err := fs.GetString(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == "" {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
@@ -84,18 +87,24 @@ func MustGetDuration(fs *pflag.FlagSet, name string) time.Duration {
 	}
 }
 
-func MustGetFloat32(fs *pflag.FlagSet, name string) float32 {
+func MustGetFloat32(fs *pflag.FlagSet, name string, allowEmpty bool) float32 {
 	if rv, err := fs.GetFloat32(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
 
-func MustGetFloat64(fs *pflag.FlagSet, name string) float64 {
+func MustGetFloat64(fs *pflag.FlagSet, name string, allowEmpty bool) float64 {
 	if rv, err := fs.GetFloat64(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
@@ -116,34 +125,46 @@ func MustGetIPv4Mask(fs *pflag.FlagSet, name string) net.IPMask {
 	}
 }
 
-func MustGetInt(fs *pflag.FlagSet, name string) int {
+func MustGetInt(fs *pflag.FlagSet, name string, allowEmpty bool) int {
 	if rv, err := fs.GetInt(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
 
-func MustGetInt32(fs *pflag.FlagSet, name string) int32 {
+func MustGetInt32(fs *pflag.FlagSet, name string, allowEmpty bool) int32 {
 	if rv, err := fs.GetInt32(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
 
-func MustGetInt64(fs *pflag.FlagSet, name string) int64 {
+func MustGetInt64(fs *pflag.FlagSet, name string, allowEmpty bool) int64 {
 	if rv, err := fs.GetInt64(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
 
-func MustGetInt8(fs *pflag.FlagSet, name string) int8 {
+func MustGetInt8(fs *pflag.FlagSet, name string, allowEmpty bool) int8 {
 	if rv, err := fs.GetInt8(name); err != nil {
 		panic(err)
 	} else {
+		if !allowEmpty && rv == 0 {
+			panic(fmt.Errorf("Flag '%s' not allowed to be empty", name))
+		}
 		return rv
 	}
 }
